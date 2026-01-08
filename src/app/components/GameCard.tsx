@@ -1,7 +1,9 @@
 import { Play, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface GameCardProps {
+  id: number | string;
   title: string;
   image: string;
   hoursPlayed: number;
@@ -22,34 +24,36 @@ const styles = {
   statIcon: "size-4 text-red-500",
 }
 
-export function GameCard({ title, image, hoursPlayed, lastPlayed }: GameCardProps) {
+export function GameCard({ id, title, image, hoursPlayed, lastPlayed }: GameCardProps) {
   return (
-    <div className={styles.container}>
-      <div className={styles.imageWrapper}>
-        <ImageWithFallback
-          src={image}
-          alt={title}
-          className={styles.image}
-        />
-        <div className={styles.imageOverlay} />
-        <div className={styles.tintOverlay} />
-        <div className={styles.playOverlay}>
-          <button className={styles.playButton}>
-            <Play className="size-5" fill="currentColor" />
-            <span>Play</span>
-          </button>
-        </div>
-      </div>
-      <div className={styles.content}>
-        <h3 className={styles.title}>{title}</h3>
-        <div className={styles.stats}>
-          <div className="flex items-center gap-1.5">
-            <Clock className={styles.statIcon} />
-            <span>{hoursPlayed}h</span>
+    <Link to={`/game/${id}`}>
+      <div className={styles.container}>
+        <div className={styles.imageWrapper}>
+          <ImageWithFallback
+            src={image}
+            alt={title}
+            className={styles.image}
+          />
+          <div className={styles.imageOverlay} />
+          <div className={styles.tintOverlay} />
+          <div className={styles.playOverlay}>
+            <button className={styles.playButton}>
+              <Play className="size-5" fill="currentColor" />
+              <span>Play</span>
+            </button>
           </div>
-          <span className="opacity-60">Last played: {lastPlayed}</span>
+        </div>
+        <div className={styles.content}>
+          <h3 className={styles.title}>{title}</h3>
+          <div className={styles.stats}>
+            <div className="flex items-center gap-1.5">
+              <Clock className={styles.statIcon} />
+              <span>{hoursPlayed}h</span>
+            </div>
+            <span className="opacity-60">Last played: {lastPlayed}</span>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

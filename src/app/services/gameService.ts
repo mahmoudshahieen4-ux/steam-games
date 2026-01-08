@@ -27,10 +27,28 @@ export async function fetchGames(params: Record<string, string> = {}) {
     return data.results;
 }
 
-export async function fetchGameDetails(id: number) {
+export async function fetchGameDetails(id: string | number) {
     const response = await fetch(`${BASE_URL}/games/${id}?key=${API_KEY}`);
     if (!response.ok) {
         throw new Error('Failed to fetch game details');
     }
     return await response.json();
+}
+
+export async function fetchGameScreenshots(id: string | number) {
+    const response = await fetch(`${BASE_URL}/games/${id}/screenshots?key=${API_KEY}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch screenshots');
+    }
+    const data = await response.json();
+    return data.results;
+}
+
+export async function fetchRelatedGames(id: string | number) {
+    const response = await fetch(`${BASE_URL}/games/${id}/suggested?key=${API_KEY}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch related games');
+    }
+    const data = await response.json();
+    return data.results;
 }

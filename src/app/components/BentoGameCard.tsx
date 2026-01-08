@@ -1,8 +1,10 @@
 import { motion } from "motion/react";
 import { Play, Star, TrendingUp, Clock, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface BentoGameCardProps {
+  id: number | string;
   title: string;
   image: string;
   price?: string;
@@ -36,6 +38,7 @@ const styles = {
 }
 
 export function BentoGameCard({
+  id,
   title,
   image,
   price,
@@ -57,105 +60,107 @@ export function BentoGameCard({
   const isLarge = size === "large" || size === "tall";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      whileHover={{ scale: 1.02, y: -5 }}
-      className={`${sizeClasses[size]} ${styles.card}`}
-    >
-      <div className={styles.background}>
-        <ImageWithFallback
-          src={image}
-          alt={title}
-          className={styles.image}
-        />
-        <div className={styles.gradientOverlay} />
-        <div className={styles.accentOverlay} />
-      </div>
-
-      {/* Hover Overlay */}
-      <div className={styles.hoverOverlay}>
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          className={styles.playButton}
-        >
-          <Play className="size-5" fill="currentColor" />
-          <span>Play Now</span>
-        </motion.button>
-      </div>
-
-      {/* Content */}
-      <div className={styles.content}>
-        <div className="flex items-start justify-between">
-          {tags && tags.length > 0 && (
-            <div className={styles.tagList}>
-              {tags.map((tag) => (
-                <span key={tag} className={styles.tag}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-          {discount && (
-            <motion.div
-              initial={{ rotate: -12 }}
-              animate={{ rotate: 0 }}
-              className={styles.discountBadge}
-            >
-              -{discount}%
-            </motion.div>
-          )}
+    <Link to={`/game/${id}`} className={sizeClasses[size]}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay }}
+        whileHover={{ scale: 1.02, y: -5 }}
+        className={`${styles.card} size-full`}
+      >
+        <div className={styles.background}>
+          <ImageWithFallback
+            src={image}
+            alt={title}
+            className={styles.image}
+          />
+          <div className={styles.gradientOverlay} />
+          <div className={styles.accentOverlay} />
         </div>
 
-        <div>
-          <motion.h3 className={styles.title(isLarge)}>
-            {title}
-          </motion.h3>
+        {/* Hover Overlay */}
+        <div className={styles.hoverOverlay}>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className={styles.playButton}
+          >
+            <Play className="size-5" fill="currentColor" />
+            <span>Play Now</span>
+          </motion.button>
+        </div>
 
-          <div className={styles.statsRow}>
-            {rating && (
-              <div className={styles.statItem}>
-                <Star className="size-4 text-yellow-500 fill-yellow-500" />
-                <span className="text-white text-sm">{rating}</span>
+        {/* Content */}
+        <div className={styles.content}>
+          <div className="flex items-start justify-between">
+            {tags && tags.length > 0 && (
+              <div className={styles.tagList}>
+                {tags.map((tag) => (
+                  <span key={tag} className={styles.tag}>
+                    {tag}
+                  </span>
+                ))}
               </div>
             )}
-            {players && (
-              <div className={styles.statItem}>
-                <Users className="size-4 text-red-400" />
-                <span className="text-white text-sm">{players}</span>
-              </div>
+            {discount && (
+              <motion.div
+                initial={{ rotate: -12 }}
+                animate={{ rotate: 0 }}
+                className={styles.discountBadge}
+              >
+                -{discount}%
+              </motion.div>
             )}
           </div>
 
-          {price && (
-            <div className={styles.priceRow}>
-              {discount ? (
-                <>
-                  <span className={styles.oldPrice}>
-                    ${price}
-                  </span>
-                  <span className={styles.currentPrice}>
-                    ${(parseFloat(price) * (1 - discount / 100)).toFixed(2)}
-                  </span>
-                </>
-              ) : (
-                <span className={styles.currentPrice}>${price}</span>
+          <div>
+            <motion.h3 className={styles.title(isLarge)}>
+              {title}
+            </motion.h3>
+
+            <div className={styles.statsRow}>
+              {rating && (
+                <div className={styles.statItem}>
+                  <Star className="size-4 text-yellow-500 fill-yellow-500" />
+                  <span className="text-white text-sm">{rating}</span>
+                </div>
+              )}
+              {players && (
+                <div className={styles.statItem}>
+                  <Users className="size-4 text-red-400" />
+                  <span className="text-white text-sm">{players}</span>
+                </div>
               )}
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Animated Border overlay */}
-      <motion.div
-        className={styles.animatedBorder}
-        whileHover={{
-          borderColor: "rgba(220, 38, 38, 0.5)",
-        }}
-        transition={{ duration: 0.3 }}
-      />
-    </motion.div>
+            {price && (
+              <div className={styles.priceRow}>
+                {discount ? (
+                  <>
+                    <span className={styles.oldPrice}>
+                      ${price}
+                    </span>
+                    <span className={styles.currentPrice}>
+                      ${(parseFloat(price) * (1 - discount / 100)).toFixed(2)}
+                    </span>
+                  </>
+                ) : (
+                  <span className={styles.currentPrice}>${price}</span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Animated Border overlay */}
+        <motion.div
+          className={styles.animatedBorder}
+          whileHover={{
+            borderColor: "rgba(220, 38, 38, 0.5)",
+          }}
+          transition={{ duration: 0.3 }}
+        />
+      </motion.div>
+    </Link>
   );
 }

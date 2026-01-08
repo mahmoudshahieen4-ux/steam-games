@@ -12,6 +12,7 @@ import Signup from "../pages/signup";
 import Login from "../pages/login";
 import LibraryPage from "../pages/library";
 import DownloadsPage from "../pages/downloads";
+import GameDetailsPage from "../pages/game-details";
 import { Navbar } from "./components/Navbar";
 import { fetchGames } from "./services/gameService";
 import { Footer } from "./components/Footer";
@@ -67,6 +68,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [tempSearch, setTempSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -250,6 +252,7 @@ export default function App() {
               <Route path="/downloads" element={<DownloadsPage />} />
               <Route path="/community" element={<div className="p-8 text-white">Community Section placeholder</div>} />
               <Route path="/friends" element={<div className="p-8 text-white">Friends Section placeholder</div>} />
+              <Route path="/game/:id" element={<GameDetailsPage />} />
               <Route path="/" element={
                 <div className={layoutStyles.contentContainer}>
                   {/* Search Bar */}
@@ -258,14 +261,29 @@ export default function App() {
                     animate={{ opacity: 1, y: 0 }}
                     className={searchStyles.container}
                   >
-                    <Search className={searchStyles.icon} />
-                    <input
-                      type="text"
-                      placeholder="Search for games..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className={searchStyles.input}
-                    />
+                    <div className="relative group flex items-center gap-2">
+                      <Search className={searchStyles.icon} />
+                      <input
+                        type="text"
+                        placeholder="Search for games..."
+                        value={tempSearch}
+                        onChange={(e) => setTempSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            setSearchQuery(tempSearch);
+                          }
+                        }}
+                        className={`${searchStyles.input} pr-24`}
+                      />
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setSearchQuery(tempSearch)}
+                        className="absolute right-2 px-6 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-sm transition-colors"
+                      >
+                        Search
+                      </motion.button>
+                    </div>
                   </motion.div>
 
                   {/* Categories */}

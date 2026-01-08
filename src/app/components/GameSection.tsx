@@ -59,6 +59,7 @@ export function GameSection({ title, icon: Icon, games, iconColor = "text-red-50
             className={styles.cardWrapper}
           >
             <GameCard
+              id={game.id}
               title={game.title}
               image={game.image}
               hoursPlayed={game.hoursPlayed || 0}
