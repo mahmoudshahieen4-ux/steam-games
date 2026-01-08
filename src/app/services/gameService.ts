@@ -1,0 +1,36 @@
+const API_KEY = import.meta.env.VITE_RAWG_API_KEY;
+const BASE_URL = 'https://api.rawg.io/api';
+
+export interface Game {
+    id: number;
+    name: string;
+    background_image: string;
+    rating: number;
+    released: string;
+    genres: { name: string }[];
+    added: number;
+    metacritic?: number;
+}
+
+export async function fetchGames(params: Record<string, string> = {}) {
+    const queryParams = new URLSearchParams({
+        key: API_KEY,
+        page_size: '12',
+        ...params,
+    });
+
+    const response = await fetch(`${BASE_URL}/games?${queryParams.toString()}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch games');
+    }
+    const data = await response.json();
+    return data.results;
+}
+
+export async function fetchGameDetails(id: number) {
+    const response = await fetch(`${BASE_URL}/games/${id}?key=${API_KEY}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch game details');
+    }
+    return await response.json();
+}
