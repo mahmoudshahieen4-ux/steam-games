@@ -25,7 +25,7 @@ const styles = {
   iconWrapper: "p-3 bg-gradient-to-br from-red-950/40 to-black/40 border border-red-900/30 rounded-lg backdrop-blur-sm",
   title: "text-white text-2xl font-semibold tracking-tight",
   divider: "flex-1 flex-grow-1 h-px bg-gradient-to-r from-red-900/50 to-transparent",
-  grid: "grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6",
+  grid: "grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6",
   cardWrapper: "relative group",
 }
 

@@ -1,7 +1,9 @@
-import { Play, Clock } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { Play, Clock, Download } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ImageWithFallback } from "./ImageWithFallback";
 
 interface GameCardProps {
+  id: number | string;
   title: string;
   image: string;
   hoursPlayed: number;
@@ -20,36 +22,49 @@ const styles = {
   title: "text-white mb-2 font-bold tracking-tight text-lg",
   stats: "flex items-center gap-4 text-sm text-gray-400 font-medium",
   statIcon: "size-4 text-red-500",
+  downloadBtn: "mt-4 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white px-4 py-2 rounded-lg border border-white/5 hover:border-red-500/30 transition-all text-xs font-bold w-full",
 }
 
-export function GameCard({ title, image, hoursPlayed, lastPlayed }: GameCardProps) {
+export function GameCard({ id, title, image, hoursPlayed, lastPlayed }: GameCardProps) {
   return (
-    <div className={styles.container}>
-      <div className={styles.imageWrapper}>
-        <ImageWithFallback
-          src={image}
-          alt={title}
-          className={styles.image}
-        />
-        <div className={styles.imageOverlay} />
-        <div className={styles.tintOverlay} />
-        <div className={styles.playOverlay}>
-          <button className={styles.playButton}>
-            <Play className="size-5" fill="currentColor" />
-            <span>Play</span>
+    <Link to={`/game/${id}`}>
+      <div className={styles.container}>
+        <div className={styles.imageWrapper}>
+          <ImageWithFallback
+            src={image}
+            alt={title}
+            className={styles.image}
+          />
+          <div className={styles.imageOverlay} />
+          <div className={styles.tintOverlay} />
+          <div className={styles.playOverlay}>
+            <div className={styles.playButton}>
+              <Play className="size-5" fill="currentColor" />
+              <span>Play</span>
+            </div>
+          </div>
+        </div>
+        <div className={styles.content}>
+          <h3 className={styles.title}>{title}</h3>
+          <div className={styles.stats}>
+            <div className="flex items-center gap-1.5">
+              <Clock className={styles.statIcon} />
+              <span>{hoursPlayed}h</span>
+            </div>
+            <span className="opacity-60">Last played: {lastPlayed}</span>
+          </div>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              alert(`Starting download for ${title}...`);
+            }}
+            className={styles.downloadBtn}
+          >
+            <Download size={14} />
+            <span>Download</span>
           </button>
         </div>
       </div>
-      <div className={styles.content}>
-        <h3 className={styles.title}>{title}</h3>
-        <div className={styles.stats}>
-          <div className="flex items-center gap-1.5">
-            <Clock className={styles.statIcon} />
-            <span>{hoursPlayed}h</span>
-          </div>
-          <span className="opacity-60">Last played: {lastPlayed}</span>
-        </div>
-      </div>
-    </div>
+    </Link>
   );
 }

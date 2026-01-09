@@ -7,7 +7,7 @@ import {
     Heart, AlertCircle, Cpu, HardDrive, Monitor, Zap
 } from "lucide-react";
 import { fetchGameDetails, fetchGameScreenshots, fetchRelatedGames } from "../app/services/gameService";
-import { ImageWithFallback } from "../app/components/figma/ImageWithFallback";
+import { ImageWithFallback } from "../app/components/ImageWithFallback";
 
 const styles = {
     container: "min-h-screen bg-black text-white pb-20",
@@ -34,23 +34,27 @@ export default function GameDetailsPage() {
     const [screenshots, setScreenshots] = useState<any[]>([]);
     const [related, setRelated] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [activeImage, setActiveImage] = useState<string | null>(null);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
             if (!id) return;
             setLoading(true);
+            setError(null);
             try {
                 const [details, screenData, relateData] = await Promise.all([
                     fetchGameDetails(id),
-                    fetchGameScreenshots(id),
-                    fetchRelatedGames(id)
+                    fetchGameScreenshots(id).catch(() => []),
+                    fetchRelatedGames(id).catch(() => [])
                 ]);
                 setGame(details);
                 setScreenshots(screenData);
                 setRelated(relateData);
-            } catch (err) {
-                console.error(err);
+            } catch (err: any) {
+                console.error("Game details fetch error:", err);
+                setError(err.message || "Failed to load game details. Please check your connection or API key.");
             } finally {
                 setLoading(false);
             }
@@ -61,16 +65,33 @@ export default function GameDetailsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-4 text-white">
                 <div className="relative">
                     <div className="size-20 border-4 border-red-900/20 border-t-red-600 rounded-full animate-spin" />
                     <Zap className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-red-600 animate-pulse" />
                 </div>
+                <p className="text-gray-400 font-medium animate-pulse">Loading game data...</p>
             </div>
         );
     }
 
-    if (!game) return <div className="p-20 text-center">Game not found</div>;
+    if (error || !game) {
+        return (
+            <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 text-center text-white">
+                <AlertCircle className="size-16 text-red-600 mb-4" />
+                <h2 className="text-3xl font-bold mb-2">Oops! Something went wrong</h2>
+                <p className="text-gray-400 max-w-md mb-8">
+                    {error || "We couldn't find the game you're looking for. It might have been removed or the ID is invalid."}
+                </p>
+                <Link
+                    to="/"
+                    className="px-8 py-3 bg-red-600 hover:bg-red-500 rounded-xl font-bold transition-colors shadow-lg shadow-red-900/40"
+                >
+                    Return to Store
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>
@@ -155,10 +176,30 @@ export default function GameDetailsPage() {
                     {/* About */}
                     <section className={styles.section}>
                         <h2 className={styles.sectionTitle}>About the Game</h2>
-                        <div
-                            className="text-gray-400 leading-relaxed text-lg prose prose-invert max-w-none"
-                            dangerouslySetInnerHTML={{ __html: game.description }}
-                        />
+                        <div className="relative">
+                            <div
+                                className={`text-gray-400 leading-relaxed text-lg prose prose-invert max-w-none transition-all duration-500 ${!isExpanded ? "max-h-[150px] overflow-hidden" : "max-h-full"}`}
+                            >
+                                {isExpanded ? (
+                                    <div dangerouslySetInnerHTML={{ __html: game.description }} />
+                                ) : (
+                                    <p>
+                                        {game.description.replace(/<[^>]*>?/gm, '').split(' ').slice(0, 30).join(' ')}
+                                        {game.description.replace(/<[^>]*>?/gm, '').split(' ').length > 30 ? "..." : ""}
+                                    </p>
+                                )}
+                            </div>
+
+                            {game.description.replace(/<[^>]*>?/gm, '').split(' ').length > 30 && (
+                                <button
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                    className="mt-4 text-red-500 font-bold hover:text-red-400 transition-colors flex items-center gap-1"
+                                >
+                                    {isExpanded ? "Show Less" : "Read More"}
+                                    <ChevronRight className={`size-4 transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+                                </button>
+                            )}
+                        </div>
                     </section>
 
                     {/* Gallery */}

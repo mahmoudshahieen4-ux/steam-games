@@ -13,22 +13,25 @@ import Login from "../pages/login";
 import LibraryPage from "../pages/library";
 import DownloadsPage from "../pages/downloads";
 import GameDetailsPage from "../pages/game-details";
+import FriendsPage from "../pages/friends";
+import CommunityPage from "../pages/community";
 import { Navbar } from "./components/Navbar";
 import { fetchGames } from "./services/gameService";
 import { Footer } from "./components/Footer";
+import { HeroSlider } from "./components/HeroSlider";
 
 const layoutStyles = {
-  wrapper: "size-full bg-black flex flex-col overflow-hidden",
+  wrapper: "h-screen bg-black flex flex-col overflow-hidden",
   background: "fixed inset-0 pointer-events-none",
   content: "flex-1 flex overflow-hidden relative",
-  mainArea: "flex-1 overflow-auto flex flex-col",
-  contentContainer: "p-6 space-y-8 relative",
+  mainArea: "flex-1 overflow-y-auto flex flex-col h-full scroll-smooth",
+  contentContainer: "w-full p-4 md:p-8 space-y-12 pb-32",
 };
 
 
 
 const sidebarStyles = {
-  container: (open: boolean) => `${open ? "w-64" : "w-0 lg:w-24"} relative bg-gradient-to-b from-red-950/10 to-black border-r border-red-900/20 transition-all duration-300 overflow-hidden flex-shrink-0 backdrop-blur-sm`,
+  container: (open: boolean) => `${open ? "w-64 fixed lg:relative" : "w-0 lg:w-24 relative"} top-[64px] lg:top-0 left-0 lg:inset-auto h-[calc(100vh-64px)] lg:h-full bg-gradient-to-b from-red-950/20 to-black border-r border-red-900/40 overflow-y-auto overflow-x-hidden flex-shrink-0 backdrop-blur-xl z-50 lg:z-40`,
   nav: "p-4 space-y-2",
   link: "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
   activeLink: "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-900/50",
@@ -46,7 +49,7 @@ const featureStyles = {
   header: "flex items-center justify-between mb-6",
   titleWrapper: "flex items-center gap-3",
   title: "text-white text-3xl font-bold tracking-tight",
-  grid: "grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4 auto-rows-[200px] grid-flow-dense",
+  grid: "grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4 auto-rows-[200px] grid-flow-dense",
   errorContainer: "p-8 text-center bg-red-950/20 border border-red-900/30 rounded-xl",
 };
 
@@ -55,7 +58,7 @@ const dashboardStyles = {
   mainColumn: "xl:col-span-2 space-y-12",
   sideColumn: "space-y-6",
   widget: "bg-gradient-to-br from-red-950/20 to-black/40 border border-red-900/20 rounded-xl p-6 backdrop-blur-sm",
-  stickyWidget: "bg-gradient-to-br from-red-950/20 to-black/40 border border-red-900/20 rounded-xl p-6 backdrop-blur-sm sticky top-6",
+  stickyWidget: "bg-gradient-to-br from-red-950/20 to-black/40 border border-red-900/20 rounded-xl p-6 backdrop-blur-sm",
   widgetHeader: "flex items-center justify-between mb-4",
   widgetTitle: "text-white flex items-center gap-2 font-medium",
   statRow: "space-y-4",
@@ -65,7 +68,7 @@ const dashboardStyles = {
 
 export default function App() {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 1024);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [tempSearch, setTempSearch] = useState("");
@@ -111,6 +114,9 @@ export default function App() {
 
         if (searchQuery) {
           params.search = searchQuery;
+        } else if (selectedCategory === "all") {
+          // If no specific category, let's show famous/popular games
+          params.ordering = "-metacritic,-rating";
         } else {
           params.ordering = "-added";
         }
@@ -124,13 +130,17 @@ export default function App() {
         }
 
         if (page === 1 && !searchQuery && selectedCategory === "all") {
-          const trending = await fetchGames({ ordering: "-rating", page_size: "4" });
+          // Fetch specifically famous games for the Hero/Trending section
+          const trending = await fetchGames({
+            search: "Grand Theft Auto V, Assassin's Creed Valhalla, Red Dead Redemption 2, Cyberpunk 2077",
+            page_size: "4"
+          });
           setTrendingGames(trending);
 
-          const bestByYear = await fetchGames({ dates: "2023-01-01,2023-12-31", ordering: "-metacritic", page_size: "4" });
+          const bestByYear = await fetchGames({ dates: "2023-01-01,2023-12-31", ordering: "-metacritic", page_size: "10" });
           setBestOfYear(bestByYear);
 
-          const offers = await fetchGames({ ordering: "-released", page_size: "4" });
+          const offers = await fetchGames({ ordering: "-released", page_size: "10" });
           setBestOffers(offers);
         }
       } catch (err) {
@@ -211,7 +221,13 @@ export default function App() {
             >
               <Link
                 to="/"
-                className={`${sidebarStyles.link} ${sidebarStyles.activeLink}`}
+                className={`${sidebarStyles.link} ${location.pathname === "/"
+                  ? sidebarStyles.activeLink
+                  : sidebarStyles.inactiveLink
+                  }`}
+                onClick={() => {
+                  if (window.innerWidth <= 1024) setSidebarOpen(false);
+                }}
               >
                 <Home className="size-5" />
                 {sidebarOpen && <span>Home</span>}
@@ -233,12 +249,37 @@ export default function App() {
                     ? sidebarStyles.activeLink
                     : sidebarStyles.inactiveLink
                     }`}
+                  onClick={() => {
+                    if (window.innerWidth <= 1024) setSidebarOpen(false);
+                  }}
                 >
                   <item.icon className="size-5" />
                   {sidebarOpen && <span>{item.label}</span>}
                 </Link>
               </motion.div>
             ))}
+
+            {/* Mobile Auth Links */}
+            {sidebarOpen && (
+              <div className="mt-8 pt-6 border-t border-red-900/30 space-y-3 sm:hidden px-2">
+                <Link
+                  to="/login"
+                  className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition-all rounded-lg hover:bg-red-900/20"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <User className="size-5" />
+                  <span>Login</span>
+                </Link>
+                <Link
+                  to="/signup"
+                  className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold rounded-lg shadow-lg shadow-red-900/40"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <User className="size-5" />
+                  <span>Sign Up</span>
+                </Link>
+              </div>
+            )}
           </nav>
         </aside>
 
@@ -250,8 +291,8 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/library" element={<LibraryPage />} />
               <Route path="/downloads" element={<DownloadsPage />} />
-              <Route path="/community" element={<div className="p-8 text-white">Community Section placeholder</div>} />
-              <Route path="/friends" element={<div className="p-8 text-white">Friends Section placeholder</div>} />
+              <Route path="/community" element={<CommunityPage />} />
+              <Route path="/friends" element={<FriendsPage />} />
               <Route path="/game/:id" element={<GameDetailsPage />} />
               <Route path="/" element={
                 <div className={layoutStyles.contentContainer}>
@@ -259,7 +300,7 @@ export default function App() {
                   <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={searchStyles.container}
+                    className={`${searchStyles.container} mb-12`}
                   >
                     <div className="relative group flex items-center gap-2">
                       <Search className={searchStyles.icon} />
@@ -285,6 +326,11 @@ export default function App() {
                       </motion.button>
                     </div>
                   </motion.div>
+
+                  {/* Hero Slider */}
+                  {!searchQuery && selectedCategory === "all" && trendingGames.length > 0 && (
+                    <HeroSlider games={trendingGames} />
+                  )}
 
                   {/* Categories */}
                   <motion.div
@@ -326,9 +372,10 @@ export default function App() {
                     {error ? (
                       <div className={featureStyles.errorContainer}>
                         <p className="text-red-400 mb-2">{error}</p>
-                        <p className="text-gray-500 text-sm">Please make sure VITE_RAWG_API_KEY is set in your .env file.</p>
+                        <p className="text-gray-500 text-sm">Please make sure the RAWG API key is configured correctly.</p>
                       </div>
                     ) : (
+
                       <>
                         <div className={featureStyles.grid}>
                           {games.map((game, index) => {
@@ -384,7 +431,7 @@ export default function App() {
                           />
 
                           <GameSection
-                            title="Best of 2023"
+                            title="Best of 2026"
                             icon={Crown}
                             games={bestOfYear.map(mapToSection)}
                             iconColor="text-red-500"

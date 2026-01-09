@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
-import { Play, Star, TrendingUp, Clock, Users } from "lucide-react";
+import { Play, Star, TrendingUp, Clock, Users, Download } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "./ImageWithFallback";
 
 interface BentoGameCardProps {
   id: number | string;
@@ -34,6 +34,7 @@ const styles = {
   priceRow: "flex items-center gap-2",
   oldPrice: "text-gray-400 line-through text-sm",
   currentPrice: "text-white text-xl font-extrabold",
+  downloadBtn: "flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white px-3 py-1.5 rounded-lg border border-white/5 hover:border-red-500/30 transition-all text-xs font-bold",
   animatedBorder: "absolute inset-0 border-2 border-transparent rounded-xl z-30 pointer-events-none"
 }
 
@@ -51,10 +52,10 @@ export function BentoGameCard({
 }: BentoGameCardProps) {
   const sizeClasses = {
     small: "col-span-1 row-span-1",
-    medium: "col-span-1 row-span-2",
-    large: "col-span-2 row-span-3",
-    wide: "col-span-2 row-span-1",
-    tall: "col-span-1 row-span-3",
+    medium: "col-span-1 row-span-1 sm:row-span-2",
+    large: "col-span-1 sm:col-span-2 row-span-1 sm:row-span-3",
+    wide: "col-span-1 sm:col-span-2 row-span-1",
+    tall: "col-span-1 row-span-1 sm:row-span-3",
   };
 
   const isLarge = size === "large" || size === "tall";
@@ -149,6 +150,19 @@ export function BentoGameCard({
                 )}
               </div>
             )}
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => {
+                e.preventDefault();
+                alert(`Starting download for ${title}...`);
+              }}
+              className={`${styles.downloadBtn} mt-4`}
+            >
+              <Download size={14} />
+              <span>Download</span>
+            </motion.button>
           </div>
         </div>
 
