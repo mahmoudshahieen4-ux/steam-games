@@ -31,7 +31,7 @@ const layoutStyles = {
 
 
 const sidebarStyles = {
-  container: (open: boolean) => `${open ? "w-64 fixed lg:relative" : "w-0 lg:w-24 relative"} top-[64px] lg:top-0 left-0 lg:inset-auto h-[calc(100vh-64px)] lg:h-full bg-gradient-to-b from-red-950/20 to-black border-r border-red-900/40 overflow-y-auto overflow-x-hidden flex-shrink-0 backdrop-blur-xl z-50 lg:z-40`,
+  container: (open: boolean) => `${open ? "w-64 fixed lg:relative" : "w-0 lg:w-24 relative"} top-[64px] lg:top-0 left-0 lg:inset-auto h-[calc(100vh-64px)] lg:h-full bg-gradient-to-b from-red-950/20 to-black border-r border-red-900/40 overflow-y-auto overflow-x-hidden flex-shrink-0 backdrop-blur-xl z-50 lg:z-40 transition-[width] duration-300 ease-in-out`,
   nav: "p-4 space-y-2",
   link: "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
   activeLink: "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-900/50",
@@ -175,7 +175,7 @@ export default function App() {
   const mapToBento = (game: any, index: number) => ({
     id: game.id,
     title: game.name,
-    image: game.background_image,
+    image: game.background_image || "https://placehold.co/600x400/1a1a1a/ffffff?text=No+Image",
     price: game.metacritic ? `${game.metacritic}.99` : "Free",
     discount: game.metacritic && game.metacritic > 80 ? 25 : undefined,
     rating: game.rating,
@@ -187,7 +187,7 @@ export default function App() {
   const mapToSection = (game: any) => ({
     id: game.id,
     title: game.name,
-    image: game.background_image,
+    image: game.background_image || "https://placehold.co/600x400/1a1a1a/ffffff?text=No+Image",
     hoursPlayed: Math.floor(Math.random() * 100),
     lastPlayed: "Jan 7, 2026",
   });

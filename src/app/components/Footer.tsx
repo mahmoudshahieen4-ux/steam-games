@@ -1,14 +1,15 @@
 import { motion } from "motion/react";
-import { Github, Twitter, Youtube, Facebook, Mail, ExternalLink, ShieldCheck, HelpCircle } from "lucide-react";
+import { Github, Twitter, Youtube, Facebook, Mail, ShieldCheck, HelpCircle } from "lucide-react";
+import logo from "../../assets/logo.png";
 
 const footerStyles = {
-    container: "bg-gradient-to-t from-black to-red-950/20 border-t border-red-900/20 py-16 px-6 relative overflow-hidden",
+    container: "bg-gradient-to-t from-black to-red-950/20 border-t border-red-900/20 py-12 px-6 relative overflow-hidden flex-shrink-0",
     grid: "max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10",
     column: "space-y-6",
     heading: "text-white font-bold text-lg flex items-center gap-2 mb-4",
     link: "text-gray-400 hover:text-red-500 transition-colors flex items-center gap-2 group cursor-pointer",
     socialIcon: "size-10 rounded-full bg-red-950/30 border border-red-900/20 flex items-center justify-center text-gray-400 hover:text-white hover:bg-red-600 transition-all duration-300",
-    bottom: "max-w-7xl mx-auto mt-16 pt-8 border-t border-red-900/10 flex flex-col md:flex-row justify-between items-center gap-6 text-gray-500 text-sm",
+    bottom: "max-w-7xl mx-auto mt-16 pt-4 border-t border-red-900/10 flex flex-col md:flex-row justify-between items-center gap-6 text-gray-500 text-sm",
     badge: "px-3 py-1 rounded-full bg-red-950/30 border border-red-900/20 text-[10px] uppercase tracking-wider text-red-500 font-bold",
 };
 
@@ -22,10 +23,8 @@ export function Footer() {
                 {/* Brand Section */}
                 <div className={footerStyles.column}>
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="size-10 bg-gradient-to-br from-red-600 to-red-800 rounded-xl flex items-center justify-center shadow-lg shadow-red-900/50">
-                            <span className="text-white font-black text-xl">S</span>
-                        </div>
-                        <span className="text-white font-bold text-2xl tracking-tighter">STEAM<span className="text-red-500">X</span></span>
+                        <img src={logo} alt="Logo" className="size-12" />
+                        <span className="text-white font-bold text-2xl tracking-tighter">STEAM <span className="text-red-600">FIRE</span></span>
                     </div>
                     <p className="text-gray-400 leading-relaxed">
                         The ultimate gaming destination. Connect, discover, and play your favorite titles on our state-of-the-art platform. Join millions of gamers worldwide.
@@ -99,7 +98,7 @@ export function Footer() {
 
             <div className={footerStyles.bottom}>
                 <div className="flex items-center gap-8">
-                    <p>© 2026 SteamX Corporation. All rights reserved.</p>
+                    <p>© 2026 STEAM FIRE Corporation. All rights reserved.</p>
                     <div className="hidden lg:flex items-center gap-6">
                         <a className="hover:text-white transition-colors cursor-pointer">Privacy Policy</a>
                         <a className="hover:text-white transition-colors cursor-pointer">Terms of Service</a>

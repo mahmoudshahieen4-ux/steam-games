@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, Settings } from "lucide-react";
-import logo from "../../assets/vecteezy_fiery-red-dragon-logo-design-a-powerful-symbol-of-strength_65755580.png";
+import logo from "../../assets/logo.png";
 interface NavbarProps {
     sidebarOpen: boolean;
     setSidebarOpen: (open: boolean) => void;
@@ -49,8 +49,8 @@ export function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
                         className={headerStyles.logo}
                     >
                         <div className="flex items-center">
-                            <img src={logo} alt="Logo" className="size-14 mr-2" />
-                            <h2 className="mr-4">STEAM <span className="text-red-600">FIRE</span></h2>
+                            <img src={logo} alt="Logo" className="size-16 mr-2" />
+                            <h2 className="mr-4">STEAM <span className="text-red-600 font-bold">FIRE</span></h2>
                         </div>
                     </motion.h1>
                 </Link>
