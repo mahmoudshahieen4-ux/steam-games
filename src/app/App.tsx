@@ -137,10 +137,12 @@ export default function App() {
           });
           setTrendingGames(trending);
 
-          const bestByYear = await fetchGames({ dates: "2023-01-01,2023-12-31", ordering: "-metacritic", page_size: "10" });
+          // Best of last year (more likely to have data)
+          const bestByYear = await fetchGames({ dates: "2025-01-01,2025-12-31", ordering: "-metacritic", page_size: "10" });
           setBestOfYear(bestByYear);
 
-          const offers = await fetchGames({ ordering: "-released", page_size: "10" });
+          // Top Rated instead of just "New Releases" to ensure quality and images
+          const offers = await fetchGames({ ordering: "-metacritic", page_size: "10" });
           setBestOffers(offers);
         }
       } catch (err) {
@@ -431,14 +433,14 @@ export default function App() {
                           />
 
                           <GameSection
-                            title="Best of 2026"
+                            title="Best of 2025"
                             icon={Crown}
                             games={bestOfYear.map(mapToSection)}
                             iconColor="text-red-500"
                           />
 
                           <GameSection
-                            title="New Releases"
+                            title="Top Rated"
                             icon={Tag}
                             games={bestOffers.map(mapToSection)}
                             iconColor="text-green-500"
