@@ -4,21 +4,33 @@ import { BentoGameCard } from "./components/BentoGameCard";
 import { CategoryButton } from "./components/CategoryButton";
 import { GameSection } from "./components/GameSection";
 import { FriendCard } from "./components/FriendCard";
+import { SkeletonBentoCard } from "./components/SkeletonBentoCard";
+import { SkeletonHero } from "./components/SkeletonHero";
 import {
   Search, ChevronDown, User, Settings, Home, Library, Users, ShoppingCart, Bell, TrendingUp, Flame, Star, Download, Menu, Trophy, Target, Gamepad2, Zap, Sparkles, Tag, Crown, Loader2,
 } from "lucide-react";
 import { Routes, Route, Link, useLocation } from "react-router-dom";
-import Signup from "../pages/signup";
-import Login from "../pages/login";
-import LibraryPage from "../pages/library";
-import DownloadsPage from "../pages/downloads";
-import GameDetailsPage from "../pages/game-details";
-import FriendsPage from "../pages/friends";
-import CommunityPage from "../pages/community";
 import { Navbar } from "./components/Navbar";
 import { fetchGames } from "./services/gameService";
 import { Footer } from "./components/Footer";
 import { HeroSlider } from "./components/HeroSlider";
+import { lazy, Suspense } from "react";
+
+// Lazy Load Pages
+const Signup = lazy(() => import("../pages/signup"));
+const Login = lazy(() => import("../pages/login"));
+const LibraryPage = lazy(() => import("../pages/library"));
+const DownloadsPage = lazy(() => import("../pages/downloads"));
+const GameDetailsPage = lazy(() => import("../pages/game-details"));
+const FriendsPage = lazy(() => import("../pages/friends"));
+const CommunityPage = lazy(() => import("../pages/community"));
+
+// Loading Component
+const PageLoader = () => (
+  <div className="h-full w-full flex items-center justify-center">
+    <Loader2 className="size-10 text-red-600 animate-spin" />
+  </div>
+);
 
 const layoutStyles = {
   wrapper: "h-screen bg-black flex flex-col overflow-hidden",
@@ -330,9 +342,13 @@ export default function App() {
                   </motion.div>
 
                   {/* Hero Slider */}
-                  {!searchQuery && selectedCategory === "all" && trendingGames.length > 0 && (
-                    <HeroSlider games={trendingGames} />
-                  )}
+                  {!searchQuery && selectedCategory === "all" ? (
+                    loading ? (
+                      <SkeletonHero />
+                    ) : (
+                      trendingGames.length > 0 && <HeroSlider games={trendingGames} />
+                    )
+                  ) : null}
 
                   {/* Categories */}
                   <motion.div
@@ -368,10 +384,14 @@ export default function App() {
                               "Featured Games"}
                         </h2>
                       </motion.div>
-                      {loading && <Loader2 className="size-6 text-red-500 animate-spin" />}
                     </div>
-
-                    {error ? (
+                    {loading ? (
+                      <div className={featureStyles.grid}>
+                        {Array.from({ length: 10 }).map((_, i) => (
+                          <SkeletonBentoCard key={i} size={getGridSize(i)} />
+                        ))}
+                      </div>
+                    ) : error ? (
                       <div className={featureStyles.errorContainer}>
                         <p className="text-red-400 mb-2">{error}</p>
                         <p className="text-gray-500 text-sm">Please make sure the RAWG API key is configured correctly.</p>
