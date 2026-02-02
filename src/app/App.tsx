@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { BentoGameCard } from "./components/BentoGameCard";
 import { CategoryButton } from "./components/CategoryButton";
@@ -93,6 +93,13 @@ export default function App() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [bestOfYear, setBestOfYear] = useState<any[]>([]);
   const [bestOffers, setBestOffers] = useState<any[]>([]);
+  const mainScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     setPage(1);
@@ -298,7 +305,7 @@ export default function App() {
         </aside>
 
         {/* Main Content */}
-        <div className={layoutStyles.mainArea}>
+        <div className={layoutStyles.mainArea} ref={mainScrollRef}>
           <div className="flex-1">
             <Routes>
               <Route path="/signup" element={<Signup />} />
