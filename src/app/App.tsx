@@ -6,6 +6,7 @@ import { GameSection } from "./components/GameSection";
 import { FriendCard } from "./components/FriendCard";
 import { SkeletonBentoCard } from "./components/SkeletonBentoCard";
 import { SkeletonHero } from "./components/SkeletonHero";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import {
   Search,
   ChevronDown,
@@ -362,289 +363,296 @@ export default function App() {
         {/* Main Content */}
         <div className={layoutStyles.mainArea} ref={mainScrollRef}>
           <div className="flex-1">
-            <Routes>
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/library" element={<LibraryPage />} />
-              <Route path="/downloads" element={<DownloadsPage />} />
-              <Route path="/community" element={<CommunityPage />} />
-              <Route path="/friends" element={<FriendsPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/game/:id" element={<GameDetailsPage />} />
-              <Route
-                path="/"
-                element={
-                  <div className={layoutStyles.contentContainer}>
-                    {/* Search Bar */}
-                    <motion.div
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`${searchStyles.container} mb-12`}
-                    >
-                      <div className="relative group flex items-center gap-2">
-                        <Search className={searchStyles.icon} />
-                        <input
-                          type="text"
-                          placeholder="Search for games..."
-                          value={tempSearch}
-                          onChange={(e) => setTempSearch(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              setSearchQuery(tempSearch);
-                            }
-                          }}
-                          className={`${searchStyles.input} pr-24`}
-                        />
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setSearchQuery(tempSearch)}
-                          className="absolute right-2 px-6 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-sm transition-colors"
-                        >
-                          Search
-                        </motion.button>
-                      </div>
-                    </motion.div>
-
-                    {/* Hero Slider */}
-                    {!searchQuery && selectedCategory === "all" ? (
-                      loading ? (
-                        <SkeletonHero />
-                      ) : (
-                        trendingGames.length > 0 && (
-                          <HeroSlider games={trendingGames} />
-                        )
-                      )
-                    ) : null}
-
-                    {/* Categories */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-red-900 scrollbar-track-transparent"
-                    >
-                      {categories.map((category) => (
-                        <CategoryButton
-                          key={category.id}
-                          icon={category.icon}
-                          label={category.label}
-                          active={selectedCategory === category.id}
-                          onClick={() => setSelectedCategory(category.id)}
-                        />
-                      ))}
-                    </motion.div>
-
-                    {/* Featured Section */}
-                    <section className={featureStyles.section}>
-                      <div className={featureStyles.header}>
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.3 }}
-                          className={featureStyles.titleWrapper}
-                        >
-                          <Flame className="size-7 text-red-500" />
-                          <h2 className={featureStyles.title}>
-                            {searchQuery
-                              ? `Search Results for "${searchQuery}"`
-                              : selectedCategory !== "all"
-                                ? `${categories.find((c) => c.id === selectedCategory)?.label} Games`
-                                : "Featured Games"}
-                          </h2>
-                        </motion.div>
-                      </div>
-                      {loading ? (
-                        <div className={featureStyles.grid}>
-                          {Array.from({ length: 10 }).map((_, i) => (
-                            <SkeletonBentoCard key={i} size={getGridSize(i)} />
-                          ))}
-                        </div>
-                      ) : error ? (
-                        <div className={featureStyles.errorContainer}>
-                          <p className="text-red-400 mb-2">{error}</p>
-                          <p className="text-gray-500 text-sm">
-                            Please make sure the RAWG API key is configured
-                            correctly.
-                          </p>
-                        </div>
-                      ) : (
-                        <>
-                          <div className={featureStyles.grid}>
-                            {games.map((game, index) => {
-                              const mapped = mapToBento(game, index);
-                              return (
-                                <BentoGameCard
-                                  key={game.id}
-                                  {...mapped}
-                                  delay={index * 0.1}
-                                />
-                              );
-                            })}
-                            {games.length === 0 && !loading && (
-                              <div className="col-span-full py-12 text-center text-gray-500 text-xl">
-                                No games found matching your criteria.
-                              </div>
-                            )}
-                          </div>
-
-                          {games.length > 0 && (
-                            <div className="flex justify-center mt-12 mb-8">
-                              <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setPage((prev) => prev + 1)}
-                                disabled={loadingMore}
-                                className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl font-bold shadow-xl shadow-red-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
-                              >
-                                {loadingMore ? (
-                                  <Loader2 className="size-5 animate-spin" />
-                                ) : (
-                                  <ChevronDown className="size-5 group-hover:translate-y-1 transition-transform" />
-                                )}
-                                <span>
-                                  {loadingMore ? "Loading..." : "Show More"}
-                                </span>
-                              </motion.button>
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </section>
-
-                    {/* Secondary Content Grid */}
-                    <div className={dashboardStyles.grid}>
-                      {/* Left Column - Game Sections */}
-                      <div className={dashboardStyles.mainColumn}>
-                        {!searchQuery && selectedCategory === "all" && (
-                          <>
-                            <GameSection
-                              title="Trending Now"
-                              icon={TrendingUp}
-                              games={trendingGames.map(mapToSection)}
-                              iconColor="text-yellow-500"
-                            />
-
-                            <GameSection
-                              title="Best of 2025"
-                              icon={Crown}
-                              games={bestOfYear.map(mapToSection)}
-                              iconColor="text-red-500"
-                            />
-
-                            <GameSection
-                              title="Top Rated"
-                              icon={Tag}
-                              games={bestOffers.map(mapToSection)}
-                              iconColor="text-green-500"
-                            />
-                          </>
-                        )}
-                      </div>
-
-                      {/* Right Column - Friends & Stats */}
-                      <div className={dashboardStyles.sideColumn}>
-                        <motion.div
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.5 }}
-                          className={dashboardStyles.stickyWidget}
-                        >
-                          <div className={dashboardStyles.widgetHeader}>
-                            <h3 className={dashboardStyles.widgetTitle}>
-                              <Users className="size-5 text-red-500" />
-                              Friends
-                            </h3>
-                            <span className="text-gray-400 text-sm">
-                              {
-                                friends.filter((f) => f.status !== "offline")
-                                  .length
+            <ErrorBoundary>
+              <Routes>
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/library" element={<LibraryPage />} />
+                <Route path="/downloads" element={<DownloadsPage />} />
+                <Route path="/community" element={<CommunityPage />} />
+                <Route path="/friends" element={<FriendsPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/game/:id" element={<GameDetailsPage />} />
+                <Route
+                  path="/"
+                  element={
+                    <div className={layoutStyles.contentContainer}>
+                      {/* Search Bar */}
+                      <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`${searchStyles.container} mb-12`}
+                      >
+                        <div className="relative group flex items-center gap-2">
+                          <Search className={searchStyles.icon} />
+                          <input
+                            type="text"
+                            placeholder="Search for games..."
+                            value={tempSearch}
+                            onChange={(e) => setTempSearch(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                setSearchQuery(tempSearch);
                               }
-                              /{friends.length} online
-                            </span>
-                          </div>
-                          <div className="space-y-3">
-                            {friends.map((friend) => (
-                              <FriendCard
-                                key={friend.id}
-                                name={friend.name}
-                                avatar={friend.avatar}
-                                status={friend.status}
-                                currentGame={friend.currentGame}
+                            }}
+                            className={`${searchStyles.input} pr-24`}
+                          />
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setSearchQuery(tempSearch)}
+                            className="absolute right-2 px-6 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold text-sm transition-colors"
+                          >
+                            Search
+                          </motion.button>
+                        </div>
+                      </motion.div>
+
+                      {/* Hero Slider */}
+                      {!searchQuery && selectedCategory === "all" ? (
+                        loading ? (
+                          <SkeletonHero />
+                        ) : (
+                          trendingGames.length > 0 && (
+                            <HeroSlider games={trendingGames} />
+                          )
+                        )
+                      ) : null}
+
+                      {/* Categories */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-red-900 scrollbar-track-transparent"
+                      >
+                        {categories.map((category) => (
+                          <CategoryButton
+                            key={category.id}
+                            icon={category.icon}
+                            label={category.label}
+                            active={selectedCategory === category.id}
+                            onClick={() => setSelectedCategory(category.id)}
+                          />
+                        ))}
+                      </motion.div>
+
+                      {/* Featured Section */}
+                      <section className={featureStyles.section}>
+                        <div className={featureStyles.header}>
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            className={featureStyles.titleWrapper}
+                          >
+                            <Flame className="size-7 text-red-500" />
+                            <h2 className={featureStyles.title}>
+                              {searchQuery
+                                ? `Search Results for "${searchQuery}"`
+                                : selectedCategory !== "all"
+                                  ? `${categories.find((c) => c.id === selectedCategory)?.label} Games`
+                                  : "Featured Games"}
+                            </h2>
+                          </motion.div>
+                        </div>
+                        {loading ? (
+                          <div className={featureStyles.grid}>
+                            {Array.from({ length: 10 }).map((_, i) => (
+                              <SkeletonBentoCard
+                                key={i}
+                                size={getGridSize(i)}
                               />
                             ))}
                           </div>
-                        </motion.div>
-
-                        <motion.div
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.6 }}
-                          className={dashboardStyles.widget}
-                        >
-                          <div className="flex items-center gap-2 mb-4">
-                            <TrendingUp className="size-5 text-red-500" />
-                            <h3 className="text-white font-medium">
-                              Your Stats
-                            </h3>
+                        ) : error ? (
+                          <div className={featureStyles.errorContainer}>
+                            <p className="text-red-400 mb-2">{error}</p>
+                            <p className="text-gray-500 text-sm">
+                              Please make sure the RAWG API key is configured
+                              correctly.
+                            </p>
                           </div>
-                          <div className={dashboardStyles.statRow}>
-                            {[
-                              {
-                                label: "Games Owned",
-                                value: "247",
-                                progress: "75%",
-                                delay: 0.7,
-                              },
-                              {
-                                label: "Achievements",
-                                value: "1,234",
-                                progress: "66%",
-                                delay: 0.8,
-                              },
-                              {
-                                label: "Total Hours",
-                                value: "2,567h",
-                                progress: "86%",
-                                delay: 0.9,
-                              },
-                            ].map((stat) => (
-                              <div key={stat.label}>
-                                <div className="flex items-center justify-between mb-2 text-sm">
-                                  <span className="text-gray-400">
-                                    {stat.label}
-                                  </span>
-                                  <motion.span
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="text-white font-medium"
-                                  >
-                                    {stat.value}
-                                  </motion.span>
-                                </div>
-                                <div
-                                  className={dashboardStyles.progressBarWrapper}
-                                >
-                                  <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: stat.progress }}
-                                    transition={{
-                                      duration: 1,
-                                      delay: stat.delay,
-                                    }}
-                                    className={dashboardStyles.progressBar}
+                        ) : (
+                          <>
+                            <div className={featureStyles.grid}>
+                              {games.map((game, index) => {
+                                const mapped = mapToBento(game, index);
+                                return (
+                                  <BentoGameCard
+                                    key={game.id}
+                                    {...mapped}
+                                    delay={index * 0.1}
                                   />
+                                );
+                              })}
+                              {games.length === 0 && !loading && (
+                                <div className="col-span-full py-12 text-center text-gray-500 text-xl">
+                                  No games found matching your criteria.
                                 </div>
+                              )}
+                            </div>
+
+                            {games.length > 0 && (
+                              <div className="flex justify-center mt-12 mb-8">
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => setPage((prev) => prev + 1)}
+                                  disabled={loadingMore}
+                                  className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl font-bold shadow-xl shadow-red-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                                >
+                                  {loadingMore ? (
+                                    <Loader2 className="size-5 animate-spin" />
+                                  ) : (
+                                    <ChevronDown className="size-5 group-hover:translate-y-1 transition-transform" />
+                                  )}
+                                  <span>
+                                    {loadingMore ? "Loading..." : "Show More"}
+                                  </span>
+                                </motion.button>
                               </div>
-                            ))}
-                          </div>
-                        </motion.div>
+                            )}
+                          </>
+                        )}
+                      </section>
+
+                      {/* Secondary Content Grid */}
+                      <div className={dashboardStyles.grid}>
+                        {/* Left Column - Game Sections */}
+                        <div className={dashboardStyles.mainColumn}>
+                          {!searchQuery && selectedCategory === "all" && (
+                            <>
+                              <GameSection
+                                title="Trending Now"
+                                icon={TrendingUp}
+                                games={trendingGames.map(mapToSection)}
+                                iconColor="text-yellow-500"
+                              />
+
+                              <GameSection
+                                title="Best of 2025"
+                                icon={Crown}
+                                games={bestOfYear.map(mapToSection)}
+                                iconColor="text-red-500"
+                              />
+
+                              <GameSection
+                                title="Top Rated"
+                                icon={Tag}
+                                games={bestOffers.map(mapToSection)}
+                                iconColor="text-green-500"
+                              />
+                            </>
+                          )}
+                        </div>
+
+                        {/* Right Column - Friends & Stats */}
+                        <div className={dashboardStyles.sideColumn}>
+                          <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.5 }}
+                            className={dashboardStyles.stickyWidget}
+                          >
+                            <div className={dashboardStyles.widgetHeader}>
+                              <h3 className={dashboardStyles.widgetTitle}>
+                                <Users className="size-5 text-red-500" />
+                                Friends
+                              </h3>
+                              <span className="text-gray-400 text-sm">
+                                {
+                                  friends.filter((f) => f.status !== "offline")
+                                    .length
+                                }
+                                /{friends.length} online
+                              </span>
+                            </div>
+                            <div className="space-y-3">
+                              {friends.map((friend) => (
+                                <FriendCard
+                                  key={friend.id}
+                                  name={friend.name}
+                                  avatar={friend.avatar}
+                                  status={friend.status}
+                                  currentGame={friend.currentGame}
+                                />
+                              ))}
+                            </div>
+                          </motion.div>
+
+                          <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.6 }}
+                            className={dashboardStyles.widget}
+                          >
+                            <div className="flex items-center gap-2 mb-4">
+                              <TrendingUp className="size-5 text-red-500" />
+                              <h3 className="text-white font-medium">
+                                Your Stats
+                              </h3>
+                            </div>
+                            <div className={dashboardStyles.statRow}>
+                              {[
+                                {
+                                  label: "Games Owned",
+                                  value: "247",
+                                  progress: "75%",
+                                  delay: 0.7,
+                                },
+                                {
+                                  label: "Achievements",
+                                  value: "1,234",
+                                  progress: "66%",
+                                  delay: 0.8,
+                                },
+                                {
+                                  label: "Total Hours",
+                                  value: "2,567h",
+                                  progress: "86%",
+                                  delay: 0.9,
+                                },
+                              ].map((stat) => (
+                                <div key={stat.label}>
+                                  <div className="flex items-center justify-between mb-2 text-sm">
+                                    <span className="text-gray-400">
+                                      {stat.label}
+                                    </span>
+                                    <motion.span
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      className="text-white font-medium"
+                                    >
+                                      {stat.value}
+                                    </motion.span>
+                                  </div>
+                                  <div
+                                    className={
+                                      dashboardStyles.progressBarWrapper
+                                    }
+                                  >
+                                    <motion.div
+                                      initial={{ width: 0 }}
+                                      animate={{ width: stat.progress }}
+                                      transition={{
+                                        duration: 1,
+                                        delay: stat.delay,
+                                      }}
+                                      className={dashboardStyles.progressBar}
+                                    />
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                }
-              />
-            </Routes>
+                  }
+                />
+              </Routes>
+            </ErrorBoundary>
           </div>
           <Footer />
         </div>

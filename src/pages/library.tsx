@@ -9,6 +9,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { fetchGames, Game } from "../app/services/gameService";
+import { OptimizedImage } from "../app/components/OptimizedImage";
 import { GameCard } from "../app/components/GameCard";
 
 export default function LibraryPage() {
@@ -81,7 +82,7 @@ export default function LibraryPage() {
             className="bg-gradient-to-br from-red-950/20 to-black/40 border border-red-900/20 rounded-xl overflow-hidden group"
           >
             <div className="aspect-video bg-red-900/10 relative">
-              <img
+              <OptimizedImage
                 src={game.background_image}
                 alt={game.name}
                 className="w-full h-full object-cover"

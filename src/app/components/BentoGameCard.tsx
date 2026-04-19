@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { Play, Star, TrendingUp, Clock, Users, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ImageWithFallback } from "./ImageWithFallback";
+import { memo } from "react";
 
 interface BentoGameCardProps {
   id: number | string;
@@ -19,24 +20,34 @@ interface BentoGameCardProps {
 const styles = {
   card: "relative group cursor-pointer rounded-xl overflow-hidden h-full w-full",
   background: "absolute inset-0",
-  image: "size-full object-cover transition-transform duration-700 group-hover:scale-110",
-  gradientOverlay: "absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80",
-  accentOverlay: "absolute inset-0 bg-gradient-to-br from-red-950/40 via-transparent to-transparent",
-  hoverOverlay: "absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20",
-  playButton: "flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 px-6 py-3 rounded-lg text-white font-bold shadow-xl shadow-red-900/20",
+  image:
+    "size-full object-cover transition-transform duration-700 group-hover:scale-110",
+  gradientOverlay:
+    "absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80",
+  accentOverlay:
+    "absolute inset-0 bg-gradient-to-br from-red-950/40 via-transparent to-transparent",
+  hoverOverlay:
+    "absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20",
+  playButton:
+    "flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 px-6 py-3 rounded-lg text-white font-bold shadow-xl shadow-red-900/20",
   content: "relative h-full flex flex-col justify-between p-4 md:p-6 z-10",
   tagList: "flex flex-wrap gap-2",
   tag: "px-2 py-1 bg-red-950/60 backdrop-blur-sm border border-red-500/30 text-red-100 text-[10px] uppercase tracking-wider font-semibold rounded-full",
-  discountBadge: "bg-gradient-to-br from-red-600 to-red-700 text-white px-3 py-1 rounded-lg text-sm font-bold shadow-lg",
-  title: (large: boolean) => `text-white mb-2 font-bold tracking-tight ${large ? "text-3xl" : "text-xl"}`,
+  discountBadge:
+    "bg-gradient-to-br from-red-600 to-red-700 text-white px-3 py-1 rounded-lg text-sm font-bold shadow-lg",
+  title: (large: boolean) =>
+    `text-white mb-2 font-bold tracking-tight ${large ? "text-3xl" : "text-xl"}`,
   statsRow: "flex items-center gap-4 flex-wrap mb-3",
-  statItem: "flex items-center gap-1 bg-black/50 backdrop-blur-sm px-2 py-1 rounded border border-white/5",
+  statItem:
+    "flex items-center gap-1 bg-black/50 backdrop-blur-sm px-2 py-1 rounded border border-white/5",
   priceRow: "flex items-center gap-2",
   oldPrice: "text-gray-400 line-through text-sm",
   currentPrice: "text-white text-xl font-extrabold",
-  downloadBtn: "flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white px-3 py-1.5 rounded-lg border border-white/5 hover:border-red-500/30 transition-all text-xs font-bold",
-  animatedBorder: "absolute inset-0 border-2 border-transparent rounded-xl z-30 pointer-events-none"
-}
+  downloadBtn:
+    "flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white/50 hover:text-white px-3 py-1.5 rounded-lg border border-white/5 hover:border-red-500/30 transition-all text-xs font-bold",
+  animatedBorder:
+    "absolute inset-0 border-2 border-transparent rounded-xl z-30 pointer-events-none",
+};
 
 export function BentoGameCard({
   id,
@@ -70,11 +81,7 @@ export function BentoGameCard({
         className={`${styles.card} size-full`}
       >
         <div className={styles.background}>
-          <ImageWithFallback
-            src={image}
-            alt={title}
-            className={styles.image}
-          />
+          <ImageWithFallback src={image} alt={title} className={styles.image} />
           <div className={styles.gradientOverlay} />
           <div className={styles.accentOverlay} />
         </div>
@@ -115,9 +122,7 @@ export function BentoGameCard({
           </div>
 
           <div>
-            <motion.h3 className={styles.title(isLarge)}>
-              {title}
-            </motion.h3>
+            <motion.h3 className={styles.title(isLarge)}>{title}</motion.h3>
 
             <div className={styles.statsRow}>
               {rating && (
@@ -138,9 +143,7 @@ export function BentoGameCard({
               <div className={styles.priceRow}>
                 {discount ? (
                   <>
-                    <span className={styles.oldPrice}>
-                      ${price}
-                    </span>
+                    <span className={styles.oldPrice}>${price}</span>
                     <span className={styles.currentPrice}>
                       ${(parseFloat(price) * (1 - discount / 100)).toFixed(2)}
                     </span>
@@ -178,3 +181,5 @@ export function BentoGameCard({
     </Link>
   );
 }
+
+export default memo(BentoGameCard);
